@@ -19,8 +19,9 @@ def printMenu():
 8. Suma totala pentru un tip de cheltuiala
 9. Suma totala pentru un apartament
 10. Apartamentele sortate dupa un tip de cheltuiala
-11. Filtreaza dupa tip cheltuiala
+11. Filtreaza dupa tip cheltuiala eliminat
 12. Filtreaza dupa costul maxim
+13. Afiseaza toate cheltuielile dintr-o categorie
 
 u. Undo
 x. Exit
@@ -225,7 +226,7 @@ def startUI():
         if cmd == '11': # Filtru dupa categorie
             cat = readCategory('Categorie: ', 'Categorie invalida.', categories)
             
-            l = board.filterByCat(cat)
+            l = board.filterByNotCat(cat)
             
             table = tableGenerator()
             table.pushHeader('Apartament')
@@ -266,6 +267,27 @@ def startUI():
                 
                 table.render()
                 
+        if cmd == '13': # Cheltuielile dintr-o categorie
+            cat = readCategory('Categorie: ', 'Categorie invalida.', categories)
+            
+            l = board.getAllInCategory(cat)
+            
+            table = tableGenerator()
+            table.pushHeader('Apartament')
+            table.pushHeader('Categorie')
+            table.pushHeader('Suma')
+            table.pushHeader('Zi')
+            table.pushHeader('Platit')
+            
+            for exp in l:
+                table.pushItem(exp.getApartment())
+                table.pushItem(exp.getCategory())
+                table.pushItem(exp.getCost())
+                table.pushItem(exp.getDay())
+                table.pushItem(exp.getPaid())
+                table.pushRow()
+            
+            table.render()
             
         if cmd == 'u': # Undo
             board.doUndo()
