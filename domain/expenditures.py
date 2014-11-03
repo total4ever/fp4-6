@@ -259,11 +259,11 @@ class BBoard(object):
 
         return total
 
-    def filterByCat(self, cat):
+    def filterByNotCat(self, cat):
         final = []
 
         for exp in self.exps:
-            if exp.getCategory() == cat:
+            if exp.getCategory() != cat:
                 final.append(exp)
 
         return final
@@ -285,6 +285,7 @@ class Expenditure():
     """
 
     categories = ['apa', 'canal', 'incalzire', 'gaz', 'altele']
+    fields = ['ap', 'cost', 'cat', 'day', 'paid']
     
     def __init__(self, ap, cat, cost, day, paid):
 
@@ -310,3 +311,13 @@ class Expenditure():
     
     def getPaid(self):
         return self.exp['paid']
+    
+    def __str__(self):
+        return str(self.exp)
+    
+    def __eq__(self, ot):
+        for field in Expenditure.fields:
+            if self.exp[field] != ot.exp[field]:
+                return False
+        
+        return True
