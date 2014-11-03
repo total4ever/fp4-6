@@ -5,55 +5,62 @@ Created on 20 oct. 2014
 '''
 
 import unittest
-from expenditures import BBoard
-from copy import deepcopy
+from domain.expenditures import BBoard, Expenditure
 
 
 
 class Tests(unittest.TestCase):
     
-    def testAddExpenditure(self):
+    def setUp(self):
+        self.board = BBoard()
         
-        board = BBoard()
-        board.addExpenditure(1, 'gaz', 15, 4)
-        board.addExpenditure(1, 'apa', 18, 4)
+        self.board.addExpenditure(1, 'gaz', 15, 4)
+        self.board.addExpenditure(1, 'apa', 18, 4)
         
-        board.addExpenditure(2, 'apa', 1, 5)
-        board.addExpenditure(2, 'canal', 9, 8)
+        self.board.addExpenditure(2, 'apa', 1, 5)
+        self.board.addExpenditure(2, 'canal', 9, 8)
         
-        exps = board.getAll()
-        self.assertEqual(len(exps), 4)
+        self.exps = self.board.getAll()
+
+    def testGetApsWithCostHigherThan(self):
+        self.assertEqual(self.board.getApsWithCostHigherThan(16), { 1: 33 })
+    
+    def testGetAllInCategory(self):
+        exps = self.exps
+        self.assertEqual(self.board.getAllInCategory('apa'), [exps[1], exps[2]])
+
+    def testGetExpendituresBeforeDayAndCostHigherThan(self):
+        exps = self.exps
+        self.assertEqual(self.board.getExpendituresBeforeDayAndCostHigherThan(5, 10), [exps[0], exps[1]])
+    
+    def testUndo(self):
+        exps = self.exps
+        
+        self.board.doUndo()
+        self.assertEqual(self.board.getAll(), exps[:-1])
+        
+    def testGetAllByApartment(self):
+        exps = self.exps
+        self.assertEqual(self.board.getAllByApartment(1), [{'exp':exps[0], 'id':0}, {'exp':exps[1], 'id':1}])
+    
+    def testUpdateExpenditure(self):
+        exps = self.exps
+        
+        self.board.updateExpenditure(1, 1, 'incalzire', 28, 8)
+
+        ex = Expenditure(1, 'incalzire', 28, 8, True)
+        exps[1] = ex
+        self.assertEqual(self.board.getAll(), exps)
+
+
+    def testRemoveByAp(self):
+        self.board.removeByAp(2)
+
+        exps = [Expenditure(1, 'gaz', 15, 4, True), Expenditure(1, 'apa', 18, 4, True)]
+        
+        self.assertEqual(self.board.getAll(), exps)
         
     
-        self.assertEqual(board.getApsWithCostHigherThan(16), { 1: 33 })
-        self.assertEqual(board.getAllInCategory('apa'), [exps[1], exps[2]])
-        self.assertEqual(board.getExpendituresBeforeDayAndCostHigherThan(5, 10), [exps[0], exps[1]])
-        
-        board.doUndo()
-        self.assertEqual(board.getAll(), exps[:-1])
-        
-        exps = exps[:-1]
-        
-        tmp = deepcopy(exps)
-        
-        tmp[0]['id'] = 0
-        tmp[1]['id'] = 1
-        self.assertEqual(board.getAllByApartment(1), [tmp[0], tmp[1]])
-        
-        board.updateExpenditure(1, 1, 'incalzire', 28, 8)
-        
-        exps[1]['ap'] = 1
-        exps[1]['cat'] = 'incalzire'
-        exps[1]['cost'] = 28
-        exps[1]['day'] = 8
-        
-        self.assertEqual(board.getAll(), exps)
-        
-        
-        board.removeByAp(2)
-        exps = [{'cat': 'gaz', 'ap': 1, 'cost': 15, 'day': 4}, {'cat': 'incalzire', 'ap': 1, 'cost': 28, 'day': 8}]
-        
-        self.assertEqual(board.getAll(), exps)
         
         
         
